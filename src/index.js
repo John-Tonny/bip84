@@ -73,10 +73,13 @@ fromMnemonic.prototype.deriveAccount = function (number, changePurpose) {
  * @param {object} pubTypes
  * @param {object} networks
  */
-function fromZPrv(zprv, pubTypes, networks) {
+function fromZPrv(zprv, pubTypes, networks, segwit) {
   this.pubTypes = pubTypes || bitcoinPubTypes
   this.networks = networks || bitcoinNetworks
   this.zprv = this.toNode(zprv)
+  // john 20220620
+  this.segwit = segwit || false
+
 }
 
 fromZPrv.prototype.toNode = function (zprv) {
@@ -175,7 +178,11 @@ fromZPrv.prototype.getAddress = function (index, isChange, purpose) {
 	purpose = purpose || 84
 
 	if (purpose === 44) {
-		payment = payments.p2pkh({ pubkey: pubkey, network: this.network })
+                if(this.segwit){
+		  payment = payments.p2wpkh({ pubkey: pubkey, network: this.network })
+                }else{
+	       	  payment = payments.p2pkh({ pubkey: pubkey, network: this.network })
+	        }
 	}
 
 	if (purpose === 49) {
@@ -282,7 +289,11 @@ fromZPub.prototype.getAddress = function (index, isChange, purpose) {
 	purpose = purpose || 84
 
 	if (purpose === 44) {
-		payment = payments.p2pkh({ pubkey: pubkey, network: this.network })
+                if(this.segwit){
+		  payment = payments.p2wpkh({ pubkey: pubkey, network: this.network })
+                }else{
+		  payment = payments.p2pkh({ pubkey: pubkey, network: this.network })
+		}
 	}
 
 	if (purpose === 49) {
